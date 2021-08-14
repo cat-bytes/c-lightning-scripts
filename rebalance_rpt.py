@@ -2,28 +2,31 @@
 
 # below is from pylightning => new package is pyln-client
 
-#from lightning import LightningRpc
 from pyln.client import LightningRpc
 from datetime import datetime
+from channel_names import *
+
+
+#def getChannelNames(rpc):
+
+#    channels = rpc.listchannels(source=info["id"])
+#    short_channels = []
+#    for channel in channels["channels"]:
+#        source = rpc.listnodes(channel["source"])
+#        src_node = source["nodes"][0]
+#        destination = rpc.listnodes(channel["destination"])
+#        dest_node = destination["nodes"][0]
+#        chan_info = { 'short_channel_id': channel["short_channel_id"], 'node_alias': dest_node["alias"] }
+#        short_channels += [chan_info]
+#        print(chan_info)
+#    return short_channels
+
 
 rpc = LightningRpc("/home/bitcoin/.lightning/bitcoin/lightning-rpc")
 
-info = rpc.getinfo()
+#info = rpc.getinfo()
 
-channels = rpc.listchannels(source=info["id"])
-short_channels = []
-for channel in channels["channels"]:
-    #short_channels += [channel["short_channel_id"]]
-    source = rpc.listnodes(channel["source"])
-    src_node = source["nodes"][0]
-    destination = rpc.listnodes(channel["destination"])
-    dest_node = destination["nodes"][0]
-    #print("short_chan_id = " + channel["short_channel_id"] + "   alias = " + dest_node["alias"])
-    chan_info = { 'short_channel_id': channel["short_channel_id"], 'node_alias': dest_node["alias"] }
-    short_channels += [chan_info]
-    print(chan_info)
-
-print(short_channels)
+short_channels = getChannelNames(rpc)
 
 invoices = rpc.listinvoices()
 
