@@ -127,12 +127,16 @@ for scid in channels:
     net_earnings = ((collected_fees[0] + collected_fees[1]) - (rebalance_cost[0] + rebalance_cost[1]))
     channel_name = list(filter(lambda x: x["short_channel_id"] == scid, channel_aliases))
     print(channel_name)
-    rows.append((channel_name[0]["node_alias"], moved[0][0], moved[1][0], moved[0][1] / 1000000.0, moved[1][1] / 1000000.0, collected_fees[0] / 1000.0, collected_fees[1] / 1000.0, rebalance_cost[0] / 1000.0, rebalance_cost[1] / 1000.0, net_earnings / 1000.0))
+    if (len(channel_name) > 0):
+       channel_alias = channel_name[0]["node_alias"]
+    else:
+       channel_alias = scid
+    rows.append((channel_alias, moved[0][0], moved[1][0], moved[0][1] / 1000000.0, moved[1][1] / 1000000.0, collected_fees[0] / 1000.0, collected_fees[1] / 1000.0, rebalance_cost[0] / 1000.0, rebalance_cost[1] / 1000.0, net_earnings / 1000.0))
 
-print("──────────────┬───────────┬──────────────────────┬──────────────────────┬──────────────────────┬──────────┐")
-print("   channel    │ # in, out │      ksat moved      │    fees collected    │  rebalancing costs   │    net   │")
-print("══════════════╪═══════════╪══════════════════════╪══════════════════════╪══════════════════════╪══════════╡")
+print("────────────────┬───────────┬──────────────────────┬──────────────────────┬──────────────────────┬──────────┐")
+print("   channel      │ # in, out │      ksat moved      │    fees collected    │  rebalancing costs   │    net   │")
+print("════════════════╪═══════════╪══════════════════════╪══════════════════════╪══════════════════════╪══════════╡")
 for row in sorted(rows, key = lambda r: r[9]):
-    print("%s │%4d, %4d │ %9.3f, %9.3f │ %9.3f, %9.3f │ %9.3f, %9.3f │ %8.3f │" % (row[0][:13].rjust(13), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
-print("──────────────┴───────────┴──────────────────────┴──────────────────────┴──────────────────────┴──────────┘")
+    print("%s │%4d, %4d │ %9.3f, %9.3f │ %9.3f, %9.3f │ %9.3f, %9.3f │ %8.3f │" % (row[0][:15].rjust(15), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
+print("────────────────┴───────────┴──────────────────────┴──────────────────────┴──────────────────────┴──────────┘")
 
