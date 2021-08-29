@@ -1,5 +1,7 @@
-
+#!/usr/bin/python3
+import re
 from pyln.client import LightningRpc
+from os.path import expanduser
 
 # Create short_channel_id to node_alias mapping
 #
@@ -13,8 +15,11 @@ def getChannelNames(rpc):
         src_node = source["nodes"][0]
         destination = rpc.listnodes(channel["destination"])
         dest_node = destination["nodes"][0]
-        chan_info = { 'short_channel_id': channel["short_channel_id"], 'node_alias': dest_node["alias"] }
+        chan_info = { 'short_channel_id': channel["short_channel_id"], 'node_alias': re.sub(r'[^a-zA-Z0-9_\. \[\]()/-]+', '', dest_node["alias"]) }
         short_channels += [chan_info]
         print(chan_info)
     return short_channels
 
+if __name__ == "__main__":
+    rpc = LightningRpc(expanduser("~") + "/.lightning/bitcoin/lightning-rpc")
+    getChannelNames(rpc)

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import sys
 import json
+import operator
 from datetime import date, datetime
 from pyln.client import LightningRpc
 from os.path import expanduser
@@ -120,11 +121,21 @@ for forward in rpc.listforwards()["forwards"]:
 
 #report statistics for channels:
 rows = []
+total_moved = [[0, 0], [0, 0]]
+total_net = 0
+total_collected_fees = [0, 0]
+total_rebalance_cost = [0, 0]
 for scid in channels:
     collected_fees = channel_fees_collected[scid] if scid in channel_fees_collected else (0, 0)
+    total_collected_fees = list(map(operator.add, tuple(total_collected_fees), collected_fees))
     moved = msat_moved[scid] if scid in msat_moved else ((0, 0), (0, 0))
+    total_moved[0] = list(map(operator.add, tuple(total_moved[0]), moved[0]))
+    total_moved[1] = list(map(operator.add, tuple(total_moved[1]), moved[1]))
     rebalance_cost = channel_rebalance_paid[scid] if scid in channel_rebalance_paid else (0, 0)
-    net_earnings = ((collected_fees[0] + collected_fees[1]) - (rebalance_cost[0] + rebalance_cost[1]))
+    total_rebalance_cost = list(map(operator.add, tuple(total_rebalance_cost), rebalance_cost))
+#    net_earnings = ((collected_fees[0] + collected_fees[1]) - (rebalance_cost[0] + rebalance_cost[1]))
+    net_earnings = collected_fees[1] - rebalance_cost[1]
+    total_net = total_net + net_earnings
     channel_name = list(filter(lambda x: x["short_channel_id"] == scid, channel_aliases))
     print(channel_name)
     if (len(channel_name) > 0):
@@ -133,10 +144,12 @@ for scid in channels:
        channel_alias = scid
     rows.append((channel_alias, moved[0][0], moved[1][0], moved[0][1] / 1000000.0, moved[1][1] / 1000000.0, collected_fees[0] / 1000.0, collected_fees[1] / 1000.0, rebalance_cost[0] / 1000.0, rebalance_cost[1] / 1000.0, net_earnings / 1000.0))
 
-print("────────────────┬───────────┬──────────────────────┬──────────────────────┬──────────────────────┬──────────┐")
-print("   channel      │ # in, out │      ksat moved      │    fees collected    │  rebalancing costs   │    net   │")
-print("════════════════╪═══════════╪══════════════════════╪══════════════════════╪══════════════════════╪══════════╡")
+print("────────────────┬───────────┬──────────────────────┬──────────────────────┬──────────────────────┬───────────┐")
+print("   channel      │ # in, out │      ksat moved      │    fees collected    │  rebalancing costs   │    net    │")
+print("════════════════╪═══════════╪══════════════════════╪══════════════════════╪══════════════════════╪═══════════╡")
 for row in sorted(rows, key = lambda r: r[9]):
-    print("%s │%4d, %4d │ %9.3f, %9.3f │ %9.3f, %9.3f │ %9.3f, %9.3f │ %8.3f │" % (row[0][:15].rjust(15), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
-print("────────────────┴───────────┴──────────────────────┴──────────────────────┴──────────────────────┴──────────┘")
+    print("%s │%4d, %4d │ %9.3f, %9.3f │ %9.3f, %9.3f │ %9.3f, %9.3f │ %9.3f │" % (row[0][:15].rjust(15), row[1], row[2], row[3], row[4], row[5], row[6], row[7], row[8], row[9]))
+print("════════════════╪═══════════╪══════════════════════╪══════════════════════╪══════════════════════╪═══════════╡")
+print("           Total│%4d, %4d │ %4.3f BTC, %4.3f BTC │ %9.3f, %9.3f │ %9.3f, %9.3f │ %8.3f │" % (total_moved[0][0], total_moved[1][0], total_moved[0][1] / 100000000000.0, total_moved[1][1] / 100000000000.0, total_collected_fees[0] / 1000.0, total_collected_fees[1] / 1000.0, total_rebalance_cost[0] / 1000.0, total_rebalance_cost[1] / 1000.0, total_net / 1000.0))
+print("────────────────┴───────────┴──────────────────────┴──────────────────────┴──────────────────────┴───────────┘")
 
