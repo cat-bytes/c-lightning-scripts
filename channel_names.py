@@ -15,7 +15,10 @@ def getChannelNames(rpc):
         src_node = source["nodes"][0]
         destination = rpc.listnodes(channel["destination"])
         dest_node = destination["nodes"][0]
-        chan_info = { 'short_channel_id': channel["short_channel_id"], 'node_alias': re.sub(r'[^a-zA-Z0-9_\. \[\]()/-]+', '', dest_node["alias"]) }
+        if "alias" in dest_node:
+            chan_info = { 'short_channel_id': channel["short_channel_id"], 'node_alias': re.sub(r'[^a-zA-Z0-9_\. \[\]()/-]+', '', dest_node["alias"]) }
+        else:
+            chan_info = { 'short_channel_id': channel["short_channel_id"], 'node_alias': dest_node["nodeid"][:12] }
         short_channels += [chan_info]
         print(chan_info)
     return short_channels
