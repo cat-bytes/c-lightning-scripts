@@ -3,7 +3,7 @@ import re
 from pyln.client import LightningRpc
 from os.path import expanduser
 
-# Create short_channel_id to node_alias mapping
+# Get list of all channels to exclude from source node except destination channel
 #
 def getExcludes(rpc, destination):
 
@@ -23,7 +23,7 @@ def getExcludes(rpc, destination):
 
 if __name__ == "__main__":
     rpc = LightningRpc(expanduser("~") + "/.lightning/bitcoin/lightning-rpc")
-    # Wallet of Satoshi
+    # Wallet of Satoshi (test)
     destination = "035e4ff418fc8b5554c5d9eea66396c227bd429a3251c8cbc711002ba215bfc226"
     excluded = getExcludes(rpc, destination)
     print(excluded)
