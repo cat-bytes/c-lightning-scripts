@@ -43,14 +43,19 @@ if epoch_end <= epoch_begin:
 
 channel_aliases = getChannelNames(rpc)
 
-for peer in rpc.listpeers()["peers"]:
-    if len(peer["channels"]) > 0:
-        chan = peer["channels"][0]
-        try:
-            scid = chan["short_channel_id"]
-            channels.add(scid)
-        except:
-            pass
+#print(rpc.listpeerchannels())
+for chan in rpc.listpeerchannels()["channels"]:
+    print(chan["short_channel_id"])
+
+#for peer in rpc.listpeers()["peers"]:
+#    if len(peer["channels"]) > 0:
+#        chan = peer["channels"][0]
+for chan in rpc.listpeerchannels()["channels"]:
+    try:
+        scid = chan["short_channel_id"]
+        channels.add(scid)
+    except:
+        pass
 
 for invoice in rpc.listinvoices()["invoices"]:
     if invoice["status"] == "paid":
