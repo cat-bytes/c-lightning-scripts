@@ -28,14 +28,11 @@ for invoice in invoices["invoices"]:
              chan_from = list(filter(lambda x: x["short_channel_id"] == rebal_route[0], short_channels))
              chan_to = list(filter(lambda x: x["short_channel_id"] == rebal_route[1], short_channels))
              dt_obj = datetime.fromtimestamp(invoice["paid_at"])
-#             amount_msat = invoice["amount_msat"]
-             transactions = rpc.listsendpays(payment_hash=invoice["payment_hash"])
-             transact = transactions["payments"]
-#             print(transact)
-#             print(str(amount_msat) + " " + str(transact[0]["msatoshi"]) + " " + str(transact[0]["msatoshi_sent"]))
-#             amount_msat = transact[0]["msatoshi"]
-             amount_msat = transact[0]["amount_msat"]
-#             sent_msat = transact[0]["msatoshi_sent"]
-             sent_msat = transact[0]["amount_sent_msat"]
-             print(dt_obj.strftime("%m/%d/%Y %H:%M:%S") + "  amount_msat = " + str(amount_msat / 1000.0) + " fee = " + str((sent_msat - amount_msat) / 1000.0) + " from " + chan_from[0]["node_alias"] + " to " + chan_to[0]["node_alias"])
+
+             sendpay = rpc.listsendpays(payment_hash=invoice["payment_hash"])
+             for transact in sendpay["payments"]:
+                 if transact["status"] == "complete":
+                     amount_msat = transact["amount_msat"]
+                     sent_msat = transact["amount_sent_msat"]
+                     print(dt_obj.strftime("%m/%d/%Y %H:%M:%S") + "  amount_msat = " + str(amount_msat / 1000.0) + " fee = " + str((sent_msat - amount_msat) / 1000.0) + " from " + chan_from[0]["node_alias"] + " to " + chan_to[0]["node_alias"])
 
