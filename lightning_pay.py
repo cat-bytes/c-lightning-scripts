@@ -37,9 +37,11 @@ if use_bolt11:
 
     payment_hash = bolt11["payment_hash"]
     print("id = " + id_ + "  payment_hash = " + payment_hash)
-    if "msatoshi" in bolt11:
+#    if "msatoshi" in bolt11:
+    if "amount_msat" in bolt11:
         amount_included_in_bolt = True
-        amount = bolt11["msatoshi"]
+#        amount = bolt11["msatoshi"]
+        amount = bolt11["amount_msat"]
     else:
         assert args.amount_in_milli_satoshi, "need argument amount_in_milli_satoshi"
         amount = args.amount_in_milli_satoshi
@@ -80,7 +82,8 @@ if use_bolt11:
         route = ld.getroute(id_, amount, maxhops=1, riskfactor=100, cltv=min_cltv_expiry, exclude=excludes)
         print(route)
 #        exit()
-        fee = route["route"][0]["msatoshi"] - amount
+#        fee = route["route"][0]["msatoshi"] - amount
+        fee = route["route"][0]["amount_msat"] - amount
 
         reply = input("Paying fee %s on amount %s (%.3f%%). Send [Y/n]? " % (fee, amount, fee / amount * 100.0))
 
