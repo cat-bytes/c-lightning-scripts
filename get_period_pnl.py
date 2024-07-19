@@ -59,7 +59,7 @@ for invoice in rpc.listinvoices()["invoices"]:
             payhash = invoice["payment_hash"]
             rebalance_payment_hashes.add(payhash)
             rebalance_channels[payhash] = tuple(invoice["description"].split(' to '))
-            rebalance_msat_received[payhash] = invoice["msatoshi_received"]
+            rebalance_msat_received[payhash] = invoice["amount_received_msat"]
 for payment in rpc.listpays()["pays"]:
     payhash = payment["payment_hash"]
     if payhash in rebalance_payment_hashes:
